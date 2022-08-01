@@ -101,8 +101,49 @@ func (client *Client) PublicChat() {
 		}
 
 		chatMsg = ""
-		fmt.Println(">>>>>>Please enter chat content or 'exit' quit")
+		fmt.Println(">>>>>>Please enter chat content or 'exit' to quit")
 		fmt.Scanln(&chatMsg)
+	}
+}
+
+// SelectUsers 查询在线用户
+func (client *Client) SelectUsers() {
+	sendMsg := "who\n"
+	_, err := client.conn.Write([]byte(sendMsg))
+	if err != nil {
+		fmt.Println("conn Write err:", err)
+		return
+	}
+}
+
+// PrivateChat 私聊业务
+func (client *Client) PrivateChat() {
+	var remoteName string
+	var chatMsg string
+	client.SelectUsers()
+	fmt.Println(">>>>>>Please enter the chat partner's[username] or 'exit' to quit")
+	fmt.Scanln(&remoteName)
+
+	for remoteName != "exit" {
+		fmt.Println(">>>>>>Please enter the message content or 'exit' to quit")
+		fmt.Scanln(&chatMsg)
+
+		for chatMsg != "exit" {
+			if len(chatMsg) != 0 {
+				sendMsg := "to|" + remoteName + "|" + chatMsg + "\n\n"
+				_, err := client.conn.Write([]byte(sendMsg))
+				if err != nil {
+					fmt.Println("conn Write err:", err)
+					break
+				}
+			}
+			chatMsg = ""
+			fmt.Println(">>>>>>Please enter the message content or 'exit' to quit")
+			fmt.Scanln(&chatMsg)
+		}
+		client.SelectUsers()
+		fmt.Println(">>>>>>Please enter the chat partner's[username] or 'exit' to quit")
+		fmt.Scanln(&remoteName)
 	}
 }
 
@@ -121,7 +162,8 @@ func (client *Client) Run() {
 			break
 		case 2:
 			// 私聊
-			fmt.Println("Private chat mode selection...")
+			//fmt.Println("Private chat mode selection...")
+			client.PrivateChat()
 			break
 		case 3:
 			// 更新用户名
