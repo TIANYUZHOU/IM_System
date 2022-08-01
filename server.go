@@ -52,7 +52,7 @@ func (this *Server) BroadCast(user *User, msg string) {
 
 func (this *Server) Handler(conn net.Conn) {
 	//...当前连接的业务
-	fmt.Println("连接建立成功")
+	fmt.Println("Connection established successfully")
 
 	user := NewUser(conn, this)
 	user.Online()
